@@ -10,10 +10,8 @@ elseif nargin == 2
     FEA_flag = varargin{2}; 
 end
 
+%IN = [3 70 100 90 80 70];    % Variables Example
 var_names = {'Num Cells'; 'Taper'; 'Diam 1'; 'Diam 2'; 'Diam 3'; 'Diam 4'};
-IN = [3 70 100 90 80 70];    % Variables Example
-
-
 %% Function Settings
 % Set function mode. % 0 - Standard, run FEA no plots & return objective. 
 func_mode=0;         % 1 - visualize lattice, 2 - run FEA and plot diff to target, 3 - check target curve, 4 - print ABQ input file

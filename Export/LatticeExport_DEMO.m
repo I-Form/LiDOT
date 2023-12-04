@@ -1,7 +1,6 @@
+% Demo of exporting lattice to .3mf file
 
 
-
-% IN(3:end) = IN(3:end)*0.1;
 % %% Define custom hex mesh to fill with lattice
 % % (lattice variables controlling cell size/aspect ratio are overwritten)
 % optionStruct.sphereRadius=10;
