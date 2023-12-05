@@ -1,9 +1,19 @@
+<img src="header.png" width="100%">   
+
+** Demonstrated in Paper :** - ref here - 
+
 # LiDOT
 Lattice Inverse Design &amp; Optimisation Tool
 
 ## Description
 
 Scripts developed for optimising lattice structures based on ABAQUS FEA. Lattices are generated in a beam-element format which can be written to an ABAQUS .INP file or exported to .3MF to be printed (beam-element extension is supported mainly in software/slicers with a focus on metal AM, tested in 3DXpert, Netfabb, nTopology)
+
+For full details on method, FEA model details and demonstrator of desing optiomisation scripts see paper linked.
+
+<div>
+<img src="TargetE_demo.gif" width="100%">   
+</div>
 
 ## Getting Started
 
@@ -19,7 +29,6 @@ Scripts developed for optimising lattice structures based on ABAQUS FEA. Lattice
 * Check file path for ABAQUS (set in ExplicitBeamCompression/StandardBeamCompression)
 
 ### Key Functions:
-Scripts are set up as applied for publication....
 
 #### `Optimisation.m`.
 * Script to run optimisation algorithm and visualise results
