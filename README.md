@@ -4,8 +4,6 @@ Lattice Inverse Design &amp; Optimisation Tool
 
 ** Demonstrated in Paper :** - ref here - 
 
-<img src="header.png" width="100%">   
-
 ## Description
 
 Scripts developed for optimising lattice structures based on ABAQUS FEA. Lattices are generated in a beam-element format which can be written to an ABAQUS .INP file or exported to .3MF to be printed (beam-element extension is supported mainly in software/slicers with a focus on metal AM, tested in 3DXpert, Netfabb, nTopology)
@@ -53,6 +51,8 @@ GenerateLattice((struct))
 %% 3D visualisation of lattice
 ViewLattice(GenerateLattice((struct)))
 ```
+
+<img src="header.png" width="100%">   
 
 #### `WireLattice.m`
 * Generates lattices based on unit cells of a set size and grid (e.g BCC, FCC, or OCTET), or on the edges/dual of an input hex or tet mesh.
