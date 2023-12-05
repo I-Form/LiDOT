@@ -2,7 +2,7 @@
 # LiDOT
 Lattice Inverse Design &amp; Optimisation Tool
 
-** Demonstrated in Paper :** - ref here - 
+**Demonstrated in Paper :** - ref here - 
 
 ## Description
 
