@@ -8,7 +8,7 @@ Lattice Inverse Design &amp; Optimisation Tool
 
 Scripts developed for optimising lattice structures to achieve a target compressive stress-strain curve. Lattices are generated in a beam-element format which can be written to an ABAQUS .INP file or exported to .3MF to be printed. The scripts can be used alone just to generate and export lattices and many lattice variations or in optimisation and FEA runs.
 
-For full details on method, FEA model details and demonstrator of desing optiomisation scripts see paper linked.
+For full details on method and demonstrator of design optimisation scripts see paper linked.
 
 **Example of optimisation process:**
 
