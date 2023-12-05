@@ -6,9 +6,11 @@ Lattice Inverse Design &amp; Optimisation Tool
 
 ## Description
 
-Scripts developed for optimising lattice structures based on ABAQUS FEA. Lattices are generated in a beam-element format which can be written to an ABAQUS .INP file or exported to .3MF to be printed (beam-element extension is supported mainly in software/slicers with a focus on metal AM, tested in 3DXpert, Netfabb, nTopology)
+Scripts developed for optimising lattice structures to achieve a target compressive stress-strain curve. Lattices are generated in a beam-element format which can be written to an ABAQUS .INP file or exported to .3MF to be printed. The scripts can be used alone just to generate and export lattices and many lattice variations or in optimisation and FEA runs.
 
 For full details on method, FEA model details and demonstrator of desing optiomisation scripts see paper linked.
+
+**Example of optimisation process:**
 
 <img src="TargetE_demo.gif" width="100%">   
 
@@ -61,6 +63,7 @@ ViewLattice(GenerateLattice((struct)))
 
 #### `LatticeExport_DEMO`
 * Demo of exporting lattice to .3mf with write3mf
+* Beam-element extension is supported mainly in software/slicers with a focus on metal AM, tested in 3DXpert, Netfabb, nTopology.
 
 ## Version History
 
