@@ -1,9 +1,10 @@
-<img src="header.png" width="100%">   
-
-** Demonstrated in Paper :** - ref here - 
 
 # LiDOT
 Lattice Inverse Design &amp; Optimisation Tool
+
+** Demonstrated in Paper :** - ref here - 
+
+<img src="header.png" width="100%">   
 
 ## Description
 
@@ -11,9 +12,7 @@ Scripts developed for optimising lattice structures based on ABAQUS FEA. Lattice
 
 For full details on method, FEA model details and demonstrator of desing optiomisation scripts see paper linked.
 
-<div>
 <img src="TargetE_demo.gif" width="100%">   
-</div>
 
 ## Getting Started
 
