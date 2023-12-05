@@ -143,7 +143,7 @@ fprintf(msgfile,'\n%s\n\n',start);
         problem.rngstate=[];
         problem.options=optimoptions(@particleswarm,...
                                     'Display','Gen','Outputfcn',@outfun_swarm,...
-                                    'SwarmSize',10,'MaxGenations',50);
+                                    'SwarmSize',10,'Maxiterations',50);
         [x, fval,~,output]=particleswarm(problem);   
 
     case 4  % Genetic Algorithm
@@ -234,7 +234,7 @@ fvals = vertcat(EvalData(:).OUT); % All raw fitness values
 gen_fvals=horzcat(GenData(1:end-1).fval);   % Includes Elites
 [mins, min_IDs] = min(gen_fvals);
 
-Gen_ids = vertcat(GenData(1:end-1).Genation);  
+Gen_ids = vertcat(GenData(1:end-1).iteration);  
 best_fvals = [min(GenData(1).fval) GenData(end).bestfval];   
 
 for i = 1:numel(Gen_ids)
@@ -370,7 +370,7 @@ ylabel('Stress (MPa)')
 
 %% Animate Geometry & Stress Strain Results - per function evaluation
 % Figure window with animation of the optimisation progression
-% Can take a few minutes to finish with many Genations
+% Can take a few minutes to finish with many iterations
 % Config = 1 or 2 . 2 -> Curve and Geom only
 ViewLattice(EvalData,"Config",1,"VarNames",Vars) ;
 

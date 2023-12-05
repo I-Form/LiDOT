@@ -1,12 +1,12 @@
 % Demo of exporting lattice to .3mf file
 
 
-% %% Define custom hex mesh to fill with lattice
-% % (lattice variables controlling cell size/aspect ratio are overwritten)
-% optionStruct.sphereRadius=10;
-% optionStruct.coreRadius=8;
+%% Define custom hex mesh to fill with lattice
+% (lattice variables controlling cell size/aspect ratio are overwritten)
+% optionStruct.sphereRadius=5;
+% optionStruct.coreRadius=3;
 % optionStruct.numElementsMantel=2;
-% optionStruct.numElementsCore=8;
+% optionStruct.numElementsCore=3;
 % optionStruct.makeHollow=1;
 % optionStruct.outputStructType=2;
 % 
@@ -16,22 +16,22 @@
 %%
 name = 'Cubic1cell' ;
 IN = [5,1,1 1];
-export=1;   % Export = 1 to write to file, 0 to view.
+export=0;   % Export = 1 to write to file, 0 to view.
 %IN = x;
-%lat_opts.meshStruct = meshOutput;
+%lat_opts.meshStruct = meshStruct;
 %% Lattice Geometry Settings
-lat_opts.Shape='Square'; % 'Square' or 'Cylinder'; 
+lat_opts.Shape='Cylinder'; % 'Square' or 'Cylinder'; 
 lat_opts.ZDir='Axial';        %["Radial","Hoop","Axial"] orientation of vertical struts for cylinders
 
 % Number of unit cells in [x,y,z] [radial,axial,inner-diameter]
-lat_opts.Dim=[1 1 1];
+lat_opts.Dim=[2 2 10];
 
 % base unit cell size [x,y,z] or [radial,hoop,axial]
 %Size=[5 5 5];
 %Size=[1000 1000 1000*IN(1)];
 
 % Change aspect ratio depending on number of cells:
-lat_opts.Size=[5 5 5];
+lat_opts.Size=[4 4 4];
 %lat_opts.Size=[4 4 4*(lat_opts.Dim(3)/IN(1))];
 %lat_opts.Dim(3)=IN(1);
 
@@ -45,13 +45,14 @@ lat_opts.taper=[1 0.8 0.8 0.8 1];          % Global Strut taper
 
 %lat_opts.gradient =[lat_opts.nominal_diam IN(4:end)];    % Z-Graded strut thicknes
 lat_opts.gradient =[1 1 1 1 0.6 0.6 0.6];    % Z-Graded strut thicknes
-lat_opts.AR_gradient=[1 0.6];   % Z-Graded Angle Ratio
+lat_opts.AR_gradient=[1 0.5 1];   % Z-Graded Angle Ratio
 
 
 lat_opts.el_per_strut=1;
 lat_opts.el_lengths=[];
 lat_opts.element_type=1;
-lat_opts.lattice_type="Edge"; % one of  "BCC" "BCCZ" "FCC" "FCCZ" "OCTET" "FYP"
+%-TYPE -  one of  ["BCC","BCCZ","FCC","FCCZ","OCTET","Dual","Edge", "tetDual","tetEdge"]
+lat_opts.lattice_type="Edge"; 
 
 if taper_on==0 
     lat_opts.taper=[]; 
@@ -77,5 +78,5 @@ if export == 1
 
     write3mf(file_name, Geometry.V, [], Geometry.E(:,[1 2]),[],Geometry.Diameters);
 else
-    ViewLattice(Geometry,'Generate',0)
+    ViewLattice(Geometry,'Generate',0,'n_sides',20)
 end

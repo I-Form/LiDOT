@@ -421,7 +421,7 @@ else  %Create plot of inital geometry/first entry
         stress_curve=plot(allStrains{1},allStresses{1},'k','LineWidth',3);
         xlabel('Strain')
         ylabel('Stress (MPa)')
-        xlim([0 0.5]); %max(target_curve(:,1))
+        xlim([0 max(target_curve(:,1))]); %max(target_curve(:,1))
         %ylim([0 max(vertcat(allStresses{:}))*1.1]);
         ylim([0 max(target_curve(:,2))*2]);
         title('Compressive Stress-Strain Curve')
@@ -447,7 +447,7 @@ else  %Create plot of inital geometry/first entry
                 end
             end
             var_legend{1} = 'Current Lattice Variables';
-            legend(var_legend(:)','Location','southoutside')
+            legend(var_legend(:)','Location','eastoutside')
             hold off
             title('Variable Values')
             xlabel('Iteration')

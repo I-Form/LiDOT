@@ -33,10 +33,11 @@ OptRun (Objective function)
 ```
 %IN = [3 70 100 90 80 70];    % Variables Example
 ```
+
 GenerateLattice / GenerateLatticeExport
 *Function generates beam-element lattices based on an input structure of lattice parameters.
 *Input an empty structure for defaults/demo. See function OptRun for details on all settings.
-**e.g. 
+*e.g. 
 ```
 %% Generate example lattice to view output structure
 GenerateLattice((struct))
@@ -47,7 +48,7 @@ ViewLattice(GenerateLattice((struct)))
 
 WireLattice
 * Generates lattices based on unit cells of a set size and grid (e.g BCC, FCC, or OCTET), or on the edges or dual lattice of an input hex or tet mesh.
-* Lattices of either unit cell can also be generated based on an input hex mesh.
+* Lattices of unit cells can also be generated based on an input hex mesh.
 * Output is: N - nodes of lattices [x y z] co-ordinates, and S - strut array with nodes in each strut.
 
 LatticeExport_DEMO
