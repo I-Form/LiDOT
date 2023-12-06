@@ -2,7 +2,7 @@
 # LiDOT
 Lattice Inverse Design &amp; Optimisation Tool
 
-**Demonstrated in Paper :** *Simulation-driven-design of metal lattice structures for a target stress-strain curve* (update with link/ref when available)
+**Demonstrated in Paper :** Brian McDonnell, Eimear O'Hara, Noel Harrison, Simulation-driven-design of metal lattice structures for a target stress-strain curve, Materials & Design, https://doi.org/10.1016/j.matdes.2023.112543.
 
 ## Description
 
