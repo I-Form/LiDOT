@@ -1,14 +1,4 @@
-function [StressStrain,AnalysisTime]=StandardBeamCompression(Geometry,FEA_Opts)
-% Wites ABAQUS Standrd input file and runs job for compression of beam element lattice structure. 
-% INPUTS
-% Geometry - output of GenerateLattice function
-% FEA_Opts - analysis options, see below or OptRun for details.
-% (no support for multiple materials, damage and perhaps other features included in this function as it is an earlier version than Explicit)
-%
-% ---- DEMO ---- 
-% run with empty input strtuctures for unit cell demo/default settings
-% e.g, run "StandardBeamCompression(GenerateLattice(struct),struct)"
-% 
+function [StressStrain,AnalysisTime]=ImplicitBeamFEA(Geometry,FEA_Opts)
 Plots=0;
 
 %% DEFAULT Analysis Options
@@ -21,20 +11,18 @@ Opts.StepParameters=[0.1 1 1e-20 0.05]; %[0.05 1 1e-9 0.05];
 MAXIncr=10000;
 
 % Contact and BCs
-Opts.StrutContact=0;          %Strut contact on (1) / off (0) / 2 defining surfaces
+Opts.StrutContact=1;          %Strut contact on (1) / off (0) / 2 defining surfaces
 Opts.BCsetting=1;            %0 - prevent rigid body movements, 1 is x and y symmetry, 2 is laterally constrained top and bottom,3 just bottom
 
-Opts.FrictionCoeff=0;
 %% DEFAULT Material Parameters
-Opts.Material.PlasticOn= 1;   %0 for off, 1 for on
-Opts.Material.DamageOn=0;
+Opts.PlasticOn= 1;   %0 for off, 1 for on
 
 % 17-4 PH (B) No Heat treatment - Data Sheet
-Opts.Material.Name='Datasheet 174PH';
-Opts.Material.Elastic=[200000 0.3];
-Opts.Material.Plastic=[620 0; 1100 0.16];
-Opts.Material.Density=7.8e-9;
+Opts.Elastic=[200000 0.3];
+Opts.Plastc=[620 0; 1100 0.16];
+Opts.Density=7.8e-9;
 
+Opts.FrictionCoeff=0;
 
 %% Change parameters accoring to FEA Options Input
 Fields=fieldnames(FEA_Opts);
@@ -53,7 +41,7 @@ clearence = Geometry.clearence;
 % Define some variables based on inputs
 el_per_strut=Geometry.lattice_params.el_per_strut;  
 elementtype=size(E,2) - 2;      
-ConExcl=ceil((el_per_strut/4));           %Number of elements excluded from contact at nodes
+ConExcl=round((el_per_strut/4));           %Number of elements excluded from contact at nodes
 
 
 %% Path names Control parameters
@@ -265,7 +253,7 @@ abaqus_spec.Assembly.Elset{3}.VAL=ContactExclusions;
 %%--> Material
 abaqus_spec.Material{1}.ATTR.name='Steel';
 abaqus_spec.Material{1}.Elastic=Opts.Material(1).Elastic;
-if Opts.Material(1).PlasticOn==1
+if Opts.PlasticOn==1
     abaqus_spec.Material{1}.Plastic=Opts.Material(1).Plastic;
 end
 

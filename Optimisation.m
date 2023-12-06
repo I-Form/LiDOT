@@ -1,22 +1,32 @@
-% This script 
+% Top-level script for running optimisation. OptRun is the objective function
+% - Extra data is stored throughtout the process in :
+% -- GenData - data grouped and organised per generation as in genetic algorithm for example 
+% -- EvalData - data stored in order of function evaluations
+% - Can restart optimisation by loading GenData and EvalData, backups saved
+% every generation in mat_out\temp_data
 
-clear all
+% Make sure previous variables cleared
+% global Gen GenData Eval EvalData Pop PopulationData
+% clear global
+% clearvars
+
+
 % Change to correct directory
-filepath = fileparts(mfilename('fullpath'));
-cd filepath
+current_path = fileparts(mfilename('fullpath'));
+cd(current_path)
 % Declaration of global variables to store data
 global Gen GenData Eval EvalData Pop PopulationData
 
 % File Names and option to load in initial polulation to restart
 load_initial_data = 0;          % Inital population loaded if == 1.
 inital_data_file = 'TEST111.mat';
-OptName='Optimisation_test1';     % Name of the optimum .obd file and the final data
+OptName='Optimisation_test';     % Name of the optimum .obd file and the final data
 
 % Optimisation Options for GA
 Algorithm=4;            % 0-Lsqnonlin, 1-Fmincon, 2-Patternsearch, 3-Swarm, 4-GA 5 - GA MO
 seed = 1;               % RNG seed
 max_gen=10;             % Max number of generations for GA, Particle swarm an multi objective
-pop_size=5;            % Population size
+pop_size=20;            % Population size 
 
 % Make folder to contain all data on optimisation case and save a copy of
 % optimisation and optrun used.
@@ -57,13 +67,13 @@ Objective=@OptRun;
 
 % Initial parameters
 % Number of Z cells - Taper - Nominal/Bottom Diam - Gradient Factors
-x0 = [3 100 100 100 100 100];
+x0 = [2 100 100 100 100 100];
 
 nvars = numel(x0);
 
 % Define upper and lower bounds - scaled to integers
-lb = [ 3  70  50  50  50  50];
-ub = [6 100 150 150 150 150];
+lb = [ 2  70  50  50  50  50];
+ub = [8 100 150 150 150 150];
 
 % Inequality Constraints (Constraint applied gradient increases towards top
 % of lattice)    A*x <= b
@@ -96,7 +106,7 @@ fprintf(msgfile,'\n%s\n\n',start);
                                     'StepTolerance',1e-6,'MaxGen',1000,...
                                     'DiffMinChange',5,...
                                     'Algorithm','trust-region-reflective',...
-                                    'Display','Gen','Outputfcn',@outfun);
+                                    'Display','iter','Outputfcn',@outfun);
         [x, Resnorm,~,~,output]=lsqnonlin(problem);    
 
     case 1  %Fmincon
@@ -113,7 +123,7 @@ fprintf(msgfile,'\n%s\n\n',start);
         problem.options=optimoptions(@fmincon,...
                                     'Algorithm','sqp',...
                                     'DiffMinChange',5,...
-                                    'Display','Gen','Outputfcn',@outfun);
+                                    'Display','iter','Outputfcn',@outfun);
         [x, fval,~,output]=fmincon(problem);    
 
     case 2  %Patternsearch
@@ -129,7 +139,7 @@ fprintf(msgfile,'\n%s\n\n',start);
         problem.solver='patternsearch';
         problem.rngstate=rng(seed);
         problem.options=optimoptions(@patternsearch,...
-                                    'Display','Gen','Outputfcn',@outfun_pat...
+                                    'Display','iter','Outputfcn',@outfun_pat...
                                     ,'MaxFunEvals',200,...
                                     'Cache','on','CacheTol',0.5);
         [x, fval,~,output]=patternsearch(problem);  
@@ -142,11 +152,15 @@ fprintf(msgfile,'\n%s\n\n',start);
         problem.ub = ub;   
         problem.rngstate=[];
         problem.options=optimoptions(@particleswarm,...
-                                    'Display','Gen','Outputfcn',@outfun_swarm,...
+                                    'Display','iter','Outputfcn',@outfun_swarm,...
                                     'SwarmSize',10,'Maxiterations',50);
         [x, fval,~,output]=particleswarm(problem);   
 
     case 4  % Genetic Algorithm
+        % Note that the "state.EvalElites = true;" in the output function was
+        % added in Matlab 2019b. You may not see full data for all
+        % generationas because elites are not evaulated again.
+        % See also "state.HaveDuplicates" -
         problem.fitnessfcn= Objective;
         problem.nvars=nvars;
         problem.Aineq = A;
@@ -160,10 +174,11 @@ fprintf(msgfile,'\n%s\n\n',start);
         problem.solver='ga';
         problem.intcon=1:nvars;
         problem.options=optimoptions(@ga,...
-                                    'Display','Gen','Outputfcn',@outfun_ga,...
+                                    'Display','diagnose','Outputfcn',@outfun_ga,...
                                     'PopulationSize',pop_size,...                       
                                     'MaxGenerations',max_gen,...%   'TimeLimit', 60*60*20, ...
                                     'MaxStallGenerations',50 ,...  % Default = 50
+                                    'EliteCount',3,...
                                     'FunctionTolerance',1e-6, ...  % Default = 1 e-6
                                     'PlotFcn', {@gaplotrange, @plotfun_ga});
         if load_initial_data == 1 
@@ -201,8 +216,8 @@ fprintf(msgfile,'\n%s\n\n',start);
  end
 
 %Run with optimum parameters
-[~]=OptRun(x,1);
-movefile('abq_out/OptRun.odb',['abq_out/' OptName '.odb']);  %rename optimimum solution odb file
+% [~]=OptRun(x,1);
+% movefile('abq_out/OptRun.odb',['abq_out/' OptName '.odb']);  %rename optimimum solution odb file
 
 OptParam=x/100;    %Scale back optimim parameters    
  

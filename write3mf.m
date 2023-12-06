@@ -28,7 +28,7 @@ function write3mf(filename , vertices , faces, beams, colors,Diam)
 %	faces    = [1 3 4; 2 3 4; 1 2 4; 1 4 3;];
 %   write3mf('D:\temp\pyramid_vertexcolor.3mf' , vertices , faces)
 %
-%  write3mf downlaoded & edited from https://github.com/cvergari/write3mf
+%  write3mf downlaoded & edited by BMcD from https://github.com/cvergari/write3mf
 
     
     if nargin < 2

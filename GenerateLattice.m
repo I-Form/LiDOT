@@ -40,7 +40,8 @@ for i=1:numel(Fields)
 end
 
 %% Create Lattice - Wirelattice - struts only
-if isempty(Opts.AR_gradient)==0 ||  isempty(Opts.layer_heights)==0 %Angle Gradient
+if isempty(Opts.AR_gradient)==0 ||  isempty(Opts.layer_heights)==0 
+    % If gradient of unit cell aspect ratio is defined
     % First, Generate base mesh.    Calculate heights for each layer
     if isempty(Opts.AR_gradient)==0         %Based on aspect ratio inputs
         Opts.AR_gradient_factors=interp1(1:numel(Opts.AR_gradient),Opts.AR_gradient,...
@@ -88,10 +89,11 @@ if isempty(Opts.AR_gradient)==0 ||  isempty(Opts.layer_heights)==0 %Angle Gradie
     [N,S,fill_vol] = WireLattice(Opts.lattice_type,'InputMesh',meshStruct,'ZDir',Opts.ZDir);
 
 elseif isempty(Opts.meshStruct) == 0
-
+    % If lattice is based on input mesh
     [N,S,fill_vol] = WireLattice(Opts.lattice_type,'InputMesh',Opts.meshStruct);
 
 else
+    % No unit cell aspect ratio or input mesh
     [N,S,fill_vol] = WireLattice(Opts.lattice_type,Opts.Dim,Opts.Size,Opts.Shape,'ZDir',Opts.ZDir);
 end
 
@@ -147,6 +149,7 @@ if isempty(Opts.node_el_multiplier) == 0  % recreate lattice if node lengths on
     % Convert to Elements
     [V,E,NormalV,S_E] = struts2beams(N,S,Opts.el_per_strut,Opts.element_type,node_el_lengths);%Opts.el_per_strut,Opts.element_type);
     
+    % Create new diameters with increase at nodes 
     if isempty(Opts.gradient)==0  %If Opts.gradient is enabled
         % get mid points of each element
         El_MidNodes=0.5*( V(E(:,1),:)  +  V(E(:,2),:) ); 
@@ -167,18 +170,18 @@ if isempty(Opts.node_el_multiplier) == 0  % recreate lattice if node lengths on
         unique_diameters = [];
     end
 
-    if isempty(Opts.taper)==0      % If Opts.taper is enabled
-        %Interpolate values for every element in a strut
-        taper_factors = interp1(1:numel(Opts.taper),Opts.taper,linspace(1,numel(Opts.taper),Opts.el_per_strut)); 
-        
-        taper_factors(1) = taper_factors(1)*Opts.node_el_multiplier;
-        taper_factors(end) = taper_factors(end)*Opts.node_el_multiplier;
-
-        %Repeat for every strut in lattice
-        taper_multipliers=repmat(taper_factors',[size(S,1) 1]);
-    else
-        taper_multipliers=ones(size(E,1),1);
+    if isempty(Opts.taper)==1      % If no taper defined, create definition to apply node increase
+        Opts.taper = [1 1 ];
     end
+    %Interpolate values for every element in a strut
+    taper_factors = interp1(1:numel(Opts.taper),Opts.taper,linspace(1,numel(Opts.taper),Opts.el_per_strut)); 
+
+    % Applied increase in diam at nodes through taper
+    taper_factors(1) = taper_factors(1)*Opts.node_el_multiplier;
+    taper_factors(end) = taper_factors(end)*Opts.node_el_multiplier;
+
+    %Repeat for every strut in lattice
+    taper_multipliers=repmat(taper_factors',[size(S,1) 1]);
         
     % Combine gradient and taper
     element_diams=element_diams.*taper_multipliers;

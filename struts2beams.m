@@ -3,7 +3,8 @@ function [V,E,NormalV,S_E] = struts2beams(N,S,varargin)
 % Converts a lattice defined using lattice nodes and struts into elements
 % with normals for the abaqus beam section definition
 % Element type: 1 for Linear (B31), 2 for Quadratic (B32)
-% Node_el_lenghts is the length of each element at the intersections 
+% Node_el_lenghts is the length of each element at the intersections -
+% GenerateLattice for example input
 
 % Process inputs and set defaults
 switch nargin

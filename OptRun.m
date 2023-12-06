@@ -1,20 +1,23 @@
 function [OUT] = OptRun(varargin)
-global Eval ParamHistory PopulationData Pop
+% Objective Function for optimisation
+% Generates lattice based on input, runs FEA and returns error to target
+% curve (as defined below)
+global Eval EvalData PopulationData Pop 
 %% Process Inputs 
 FEA_flag = 0;  %
 if nargin == 1
     IN = varargin{1};
 elseif nargin == 2
-    % If FEA flag == 1, FEA will run even if same variables are in ParamHistory
+    % If FEA flag == 1, FEA will run even if same variables are in EvalData
     IN = varargin{1};
     FEA_flag = varargin{2}; 
 end
 
-%IN = [3 70 100 90 80 70];    % Variables Example
+IN = [2 70 100 90 80 70];    % Variables Example
 var_names = {'Num Cells'; 'Taper'; 'Diam 1'; 'Diam 2'; 'Diam 3'; 'Diam 4'};
 %% Function Settings
 % Set function mode. % 0 - Standard, run FEA no plots & return objective. 
-func_mode=0;         % 1 - visualize lattice, 2 - run FEA and plot diff to target, 3 - check target curve, 4 - print ABQ input file
+func_mode=3;         % 1 - visualize lattice, 2 - run FEA and plot diff to target, 3 - check target curve, 4 - print ABQ input file
 
 Objective=1;            % 0 - Curve fit error (vector), 1 - Curve fit error (scalar RMSE), 2 - 1/Strength , 3 - 1/Energy Absorption, 4 - MULTI-OBJ
 strength_cutoff=0.1;    % Strength is calculated as max stress at strain <= strength_cutoff
@@ -27,13 +30,13 @@ else
     IN(2:end)=IN(2:end)/100;  
     
     lat_opts.lattice_type="BCC"; % one of  "BCC" "BCCZ" "FCC" "FCCZ" "OCTET" "DUAL"
-    lat_opts.Shape='Square';   % 'Square' or 'Cylinder' . 'SquareSym' Halves inner cells for symmetry BCs
+    lat_opts.Shape='SquareSym';   % 'Square' or 'Cylinder' . 'SquareSym' Halves inner cells for symmetry BCs
     lat_opts.ZDir='Axial';        %["Radial","Hoop","Axial"] orientation of vertical struts for cylinders
     
     % Nominal number of unit cells in [x,y,z] [radial,axial,inner-diameter] 
-    lat_opts.Dim=[3 3 3]; 
+    lat_opts.Dim=[3 3 5]; 
     % Nominl unit cell size in mm  [x,y,z] or [radial,hoop,axial]
-    cell_size = 5 ; 
+    cell_size = 4 ; 
     
     % Change size of unit cell depending on number of Z cells in input
     lat_opts.Size=[cell_size cell_size cell_size*(lat_opts.Dim(3)/IN(1))];
@@ -44,7 +47,7 @@ else
     
     % Set variables to empty arrays [] to turn off.
     % Strut taper - local variation in strut diameter. Applied to allstruts
-    lat_opts.taper=[1 IN(2) 1];                          
+    lat_opts.taper=[]; % [1 IN(2) 1];                          
     % Graded Strut thickness from bottom to top of lattice 
     lat_opts.gradient =[lat_opts.nominal_diam IN(4:end)];    
     lat_opts.AR_gradient=[];                                 % Graded Aspect Ratio
@@ -52,8 +55,7 @@ else
     
     % Mesh Settings
     lat_opts.el_per_strut=6;             % Elements per strut (mesh density)
-    lat_opts.element_type=1;             % 1 - B31, 2 - B32
-    %lat_opts.el_spacing=[];              % Customisation of length of each element 
+    lat_opts.element_type=1;             % 1 - B31, 2 - B32 
     lat_opts.node_el_multiplier=1.4;   % Increase in diameter at strut intersections
 
     % Material Transition Plane for bi-material lattices. 
@@ -66,12 +68,12 @@ end
 
 
 %% FEA Settings
-Options.FileName='OptRunSphere';   % ABAQUS file name   
+Options.FileName='OptRun';   % ABAQUS file name   
 
 % Boundary Conditons
-Options.appliedStrain= -0.75;   %This is an approximate value based on height of lattice
+Options.appliedStrain= -0.7;   %This is an approximate value based on height of lattice
 
-Options.BCsetting=2;  % 0 - prevent rigid body movements, 1 - x and y symmetry,
+Options.BCsetting=1;  % 0 - prevent rigid body movements, 1 - x and y symmetry,
 % 2 - Displacement constraints top and bottom, 3 - Displacement & Rotation Top and bottom
 % 4 - Sandwich panels with hex elements instead of rigid plates,  5 - Sandwich panels with symmetry BCs
 % Else - No BC on lattice, Friction only
@@ -135,30 +137,30 @@ Options.MaxDeg = 0.95; %Max stiffness degredation for elements before they are d
 %Implicit Settings
 % [Initial Time increment, Step time period, minimum increment time, max increment time]
 Options.StepParameters=[0.1 1 1e-25 0.1];   
-Options.StrutContact=1;                     % Strut contact on (1) / off (0)
+Options.StrutContact=0;                     % Strut contact on (1) / off (0)
 
 %Explicit settings
-Options.Time=5;                 % Step time length  
-Options.MassScalingOn=2;        % 0 off, 1 fixed, 2 variable
+Options.Time=2;                 % Step time length  
+Options.MassScalingOn=1;        % 0 off, 1 fixed, 2 variable
 Options.MSIncSize=1e-05;        % Mass scaling - defined stable increment size  
 Options.MSIntervals = 1000;     % Intervals for variable mass scaling (if enabled)
-Options.Num_intervals=200;      % number of output interval
+Options.Num_intervals=100;      % number of output interval
 
 %% Define custom hex mesh to fill with lattice
 % Example of using a custom base mesh for lattice.
 % (lattice variables controlling cell size/aspect ratio are overwritten)
-optionStruct.sphereRadius=20;
-optionStruct.coreRadius=15;
-optionStruct.numElementsMantel=1;
-optionStruct.numElementsCore=4;
-optionStruct.makeHollow=1;
-optionStruct.outputStructType=2;
-
-%Creating sphere
-[meshStruct]=hexMeshSphere(optionStruct);
-
-% Un-comment to include:
-lat_opts.meshStruct = meshStruct;
+% optionStruct.sphereRadius=20;
+% optionStruct.coreRadius=15;
+% optionStruct.numElementsMantel=1;
+% optionStruct.numElementsCore=4;
+% optionStruct.makeHollow=1;
+% optionStruct.outputStructType=2;
+% 
+% %Creating sphere
+% [meshStruct]=hexMeshSphere(optionStruct);
+% 
+% % Un-comment to include:
+% lat_opts.meshStruct = meshStruct;
 
 %% Define Target Curve 
 % Target Curve - Interpolated to get target curve
@@ -166,16 +168,16 @@ lat_opts.meshStruct = meshStruct;
 %target_curve=[0 0 ; 0.025 7.5; 0.05 15; 0.25 15; 0.5  15; 0.75 15]; 
 
 % Linear Target B - YS 10 MPa
-target_curve=[0 0; 0.025 5; 0.05 10; (0.05 + 0.7/3) 15; 0.75  25]; 
+%target_curve=[0 0; 0.025 5; 0.05 10; (0.05 + 0.7/3) 15; 0.75  25]; 
 
-%  Step F -  Target C
+%  Target C densification
 %target_curve=[0 0; 0.025 5; 0.05 10; 0.15 10; 0.3  10; 0.4 10; 0.5 60];
 
 % Linear Target D - YS 15 MPa
 % target_curve=[0 0; 0.025 7.5; 0.05 15;0.4 25; 0.75  35]; 
 
-% Non-Linear increase - Target E
-% target_curve=[0 0; 0.025 5; 0.05 10; 0.3  12; 0.5 16; 0.6 19; 0.75 25];
+%Non-Linear increase - Target E
+target_curve=[0 0; 0.025 5; 0.05 10; 0.3  12; 0.5 16; 0.6 19; 0.75 25];
 
 
 target_yield = [0.05, 10]; % Used for graphing to check final curve
@@ -264,39 +266,39 @@ disp(Eval)
 if exist('Eval', 'var')==1 & Eval > 1   % Optimisation is running
     if FEA_flag==0  % if FEA_flag = 1, FEA is forced regardless of input
         % List of all previous variables
-        VarHistory=vertcat(ParamHistory(:).variable_vals);
+        VarHistory=vertcat(EvalData(:).variable_vals);
 
         % Check if the same variabls have been inputted before
         VarRepeat = sum(IN==VarHistory,2)==size(VarHistory,2);
         if nnz(VarRepeat) > 0
             % Copy all data from previous entry
             index=find(VarRepeat);
-            OUT = ParamHistory(index(1)).OUT ;
-            ParamHistory(Eval).variable_vals=IN;
-            ParamHistory(Eval).variable_names=var_names;
-            ParamHistory(Eval).target_curve=ParamHistory(index(1)).target_curve;
-            ParamHistory(Eval).StressStrain=ParamHistory(index(1)).StressStrain;
-            %ParamHistory(Eval).normResult=ParamHistory(index(1)).normResult;
-            ParamHistory(Eval).error_points=ParamHistory(index(1)).error_points;
-            ParamHistory(Eval).Strength=ParamHistory(index(1)).Strength;
-            ParamHistory(Eval).Energy=ParamHistory(index(1)).Energy;
-            %ParamHistory(Eval).dist=ParamHistory(index(1)).dist; 
-            ParamHistory(Eval).Time=ParamHistory(index(1)).Time;
+            OUT = EvalData(index(1)).OUT ;
+            EvalData(Eval).variable_vals=IN;
+            EvalData(Eval).variable_names=var_names;
+            EvalData(Eval).target_curve=EvalData(index(1)).target_curve;
+            EvalData(Eval).StressStrain=EvalData(index(1)).StressStrain;
+            %EvalData(Eval).normResult=EvalData(index(1)).normResult;
+            EvalData(Eval).error_points=EvalData(index(1)).error_points;
+            EvalData(Eval).Strength=EvalData(index(1)).Strength;
+            EvalData(Eval).Energy=EvalData(index(1)).Energy;
+            %EvalData(Eval).dist=EvalData(index(1)).dist; 
+            EvalData(Eval).Time=EvalData(index(1)).Time;
 
             if FEMethod==2
-                ParamHistory(Eval).Energies=ParamHistory(index(1)).Energies;
+                EvalData(Eval).Energies=EvalData(index(1)).Energies;
             end
 
-            ParamHistory(Eval).Geometry=ParamHistory(index(1)).Geometry; 
-            ParamHistory(Eval).OUT=ParamHistory(index(1)).OUT; 
-            ParamHistory(Eval).attr_out=ParamHistory(index(1)).attr_out;
-            %ParamHistory(Eval).print_out=ParamHistory(index(1)).print_out; 
+            EvalData(Eval).Geometry=EvalData(index(1)).Geometry; 
+            EvalData(Eval).OUT=EvalData(index(1)).OUT; 
+            EvalData(Eval).attr_out=EvalData(index(1)).attr_out;
+            %EvalData(Eval).print_out=EvalData(index(1)).print_out; 
             
-            PopulationData(Pop) = ParamHistory(Eval);
+            PopulationData(Pop) = EvalData(Eval);
             
-            fprintf(msgfile,'%s : %9.5f \n', ParamHistory(Eval).attr_out,...
-                                             ParamHistory(Eval).OUT);    
-            fprintf(msgfile,'Final Strain: %9.3f \n\n', ParamHistory(Eval).StressStrain(end,1));    
+            fprintf(msgfile,'%s : %9.5f \n', EvalData(Eval).attr_out,...
+                                             EvalData(Eval).OUT);    
+            fprintf(msgfile,'Final Strain: %9.3f \n\n', EvalData(Eval).StressStrain(end,1));    
             fclose(msgfile);
             return
 
@@ -333,6 +335,7 @@ if Options.BCsetting == 4 || Options.BCsetting == 5 % For Hex sandwich panels
     [StressStrain,AnalysisTime,Energies]=ExplicitBeamCompressionSP(Geometry,Options);
 elseif FEMethod ==1     % Abaqus Standard
     [StressStrain,AnalysisTime]=StandardBeamCompression(Geometry,Options);
+    %[StressStrain,AnalysisTime]=ImplicitBeamFEA(Geometry,Options);
 elseif FEMethod==2      % Abaqus Explicit
     [StressStrain,AnalysisTime,Energies]=ExplicitBeamCompression(Geometry,Options);
 end
@@ -419,23 +422,23 @@ end
 
 %% Update Global variables for optimisation
 if exist('Eval', 'var')==1 & Eval > 0 %if Eval is defined
-    ParamHistory(Eval).variable_vals=IN;
-    ParamHistory(Eval).variable_names=var_names;
-    ParamHistory(Eval).StressStrain=StressStrain;
-    ParamHistory(Eval).target_curve=[strain_vals' target_stress_resize'];
-    %ParamHistory(Eval).normalised_stress=normResult;
-    ParamHistory(Eval).error_points={XDistpoints YDistpoints};
-    ParamHistory(Eval).Strength=max_strength;
-    ParamHistory(Eval).Energy=Energy;
-    %ParamHistory(Eval).dist=error; 
-    ParamHistory(Eval).Time=AnalysisTime;
+    EvalData(Eval).variable_vals=IN;
+    EvalData(Eval).variable_names=var_names;
+    EvalData(Eval).StressStrain=StressStrain;
+    EvalData(Eval).target_curve=[strain_vals' target_stress_resize'];
+    %EvalData(Eval).normalised_stress=normResult;
+    EvalData(Eval).error_points={XDistpoints YDistpoints};
+    EvalData(Eval).Strength=max_strength;
+    EvalData(Eval).Energy=Energy;
+    %EvalData(Eval).dist=error; 
+    EvalData(Eval).Time=AnalysisTime;
     if FEMethod==2
-        ParamHistory(Eval).Energies=Energies;
+        EvalData(Eval).Energies=Energies;
     end
-    ParamHistory(Eval).Geometry=Geometry; 
-    ParamHistory(Eval).OUT=OUT; 
-    ParamHistory(Eval).attr_out=attr_out; 
-    %ParamHistory(Eval).print_out=print_out;
+    EvalData(Eval).Geometry=Geometry; 
+    EvalData(Eval).OUT=OUT; 
+    EvalData(Eval).attr_out=attr_out; 
+    %EvalData(Eval).print_out=print_out;
     
      if abs(StressStrain(end,1)) < (abs(Options.appliedStrain)*0.9)   
         % Create Copy of obd if it doesn't run to completion (otherwise
@@ -446,10 +449,10 @@ if exist('Eval', 'var')==1 & Eval > 0 %if Eval is defined
         % Normalise error with respect to the max strain in the simulation
         % -  otherwise optimisation will favour simulations which fail
         OUT(1) =  OUT(1) * ( abs(Options.appliedStrain)/abs(StressStrain(end,1)) );
-        ParamHistory(Eval).OUT=OUT; 
+        EvalData(Eval).OUT=OUT; 
      end
 
-    PopulationData(Pop) = ParamHistory(Eval);
+    PopulationData(Pop) = EvalData(Eval);
     fprintf(msgfile,'%s : %9.5f \n',attr_out ,print_out );    
     fprintf(msgfile,'Final Strain: %9.3f \n\n',(StressStrain(end,1)));    
     fclose(msgfile);
