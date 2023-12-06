@@ -392,4 +392,7 @@ ViewLattice(EvalData,"Config",1,"VarNames",Vars) ;
 %% Animate Geometry & Stress Strain Results - Best for each Generation
 ViewLattice(gen_best_data,"Config",1,"VarNames",Vars);
 
-
+%%
+% Lattice Inverse Design & Optimisation Tool 
+% 06/12/2023 - Brian McDonnell - University of Galway
+% GNU AFFERO GENERAL PUBLIC LICENSE - See LICENSE file details

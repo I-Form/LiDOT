@@ -80,3 +80,8 @@ if export == 1
 else
     ViewLattice(Geometry,'Generate',0,'n_sides',20)
 end
+
+%%
+% Lattice Inverse Design & Optimisation Tool 
+% 06/12/2023 - Brian McDonnell - University of Galway
+% GNU AFFERO GENERAL PUBLIC LICENSE - See LICENSE file details

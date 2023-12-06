@@ -154,3 +154,8 @@ Geometry.S_E=S_E;
 Geometry.material_ID=[];
 
 end
+
+%%
+% Lattice Inverse Design & Optimisation Tool 
+% 06/12/2023 - Brian McDonnell - University of Galway
+% GNU AFFERO GENERAL PUBLIC LICENSE - See LICENSE file details
