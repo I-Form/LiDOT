@@ -65,14 +65,9 @@ ViewLattice(GenerateLattice((struct)))
 * Demo of exporting lattice to .3mf with write3mf
 * Beam-element extension is supported mainly in software/slicers with a focus on metal AM, tested in 3DXpert, Netfabb, nTopology.
 
-## Version History
-
-* 1.0
-    * Initial Release
-
 ## License
 
-This project is licensed under the GNU Affero General Public License version 3 License - see the LICENSE.md file for details
+This project is licensed under the GNU Affero General Public License version 3 License - see the LICENSE file for details
 
 ## Acknowledgments
 
