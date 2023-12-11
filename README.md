@@ -31,7 +31,7 @@ For full details on method and demonstrator of design optimisation see paper lin
 
 #### `Optimisation.m`.
 * Script to run optimisation algorithm and visualise results
-* Set varialbes, bounds, constraints, optimisation algorithm parameters etc...
+* Set varialbes, bounds, constraints, optimisation algorithm parameters etc.
 
 #### `OptRun.m` (Objective function)
 * Generates lattice based on input variables, runs FE with ABAQUS and returns objective function.
